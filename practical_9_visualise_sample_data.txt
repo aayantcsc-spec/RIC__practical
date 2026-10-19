@@ -1,0 +1,46 @@
+# Practical 9: Visualise and analyse sample data - bar plot, histogram, multi-line, scatter plot
+# One-time install:  install.packages("readxl")
+# Needs RDATA.xlsx and RDATA2.csv (Date, Day, Temperature, Rainfall, Flyers, Price, Sales)
+library(readxl)
+input <- read_excel("RDATA.xlsx")
+print(input)
+
+# ---- BAR PLOT ----
+png(file = "BarPlot.png")
+barplot(input$Temperature, xlab = "Day", ylab = "Temperature", col = "green",
+        main = "Temperature per day")      # FIX: axis labels now match what is plotted
+dev.off()
+
+# ---- MULTI-LINE ----
+data <- read.csv("RDATA2.csv")
+print(data)
+t <- data[, c("Temperature")]
+s <- data[, c("Sales")]
+print(t)
+print(s)
+png(file = "Sales_Temp_Line2.png")
+plot(t, type = "o", col = "red", xlab = "Day", ylab = "", main = "Sales & Temperature",
+     ylim = range(c(t, s)))
+lines(s, type = "o", col = "blue")
+legend("topright", c("Temperature", "Sales"), col = c("red", "blue"), lty = 1, pch = 1)
+dev.off()
+
+# ---- HISTOGRAM ----
+png(file = "Histogram.png")
+hist(input$Temperature, labels = TRUE, xlab = "Temperature",
+     main = "Histogram of Temperature", col = "gold", border = "firebrick1")
+dev.off()
+
+# ---- SCATTER PLOT ----
+print(head(input))
+png(file = "scatterplot.png")
+plot(x = input$Temperature, y = input$Sales,
+     xlab = "Temperature", ylab = "Sales",
+     xlim = c(30, 40), ylim = c(10, 20),
+     main = "TEMPERATURE vs SALES")
+dev.off()
+
+# ---- SCATTERPLOT MATRIX ----
+png(file = "scatterplot_matrices.png")
+pairs(~ Temperature + Rainfall + Price + Sales, data = input, main = "SCATTERPLOT MATRIX")
+dev.off()

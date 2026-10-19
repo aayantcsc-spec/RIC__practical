@@ -1,0 +1,15 @@
+# Practical 3: Line graph of Temperature and Sales (uses PRAC3.csv)
+data <- read.csv("PRAC3.csv")
+print(data)
+t <- data[, c("Temperature")]
+s <- data[, c("Sales")]
+print(t)
+print(s)
+
+# To save in another directory: setwd("path/to/other/directory") before png()
+png(file = "Sales_Temp_Line2.png")
+plot(t, type = "o", col = "red", xlab = "Day", ylab = "", main = "Sales & Temperature",
+     ylim = range(c(t, s)))      # FIX: common y-range so both lines are visible
+lines(s, type = "o", col = "blue")
+legend("topright", c("Temperature", "Sales"), col = c("red", "blue"), lty = 1, pch = 1)
+dev.off()

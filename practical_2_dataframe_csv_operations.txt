@@ -1,0 +1,52 @@
+# Practical 2: Dataframe / CSV operations (uses sales.csv in the working directory)
+
+# 1. Convert given data into a dataframe (read from CSV)
+data <- read.csv("sales.csv")
+test <- data                      # FIX: journal used 'test' without ever creating it
+print(data)
+
+# 2. Print TRUE if data available, find number of rows and columns
+nr <- nrow(test)
+nc <- ncol(test)
+cat("Data available ", all(test != 0), "\n")
+cat("Number of rows ", nr, "\n")
+cat("Number of columns ", nc, "\n")
+
+# 3. Average of total sales
+cat("Average of sales", mean(test$Sales), "\n")
+
+# 4. Add 3 rows in dataframe
+new.data <- data.frame(
+  Date = c("1/11/2017", "1/12/2017", "1/13/2017"),
+  Day = c("Wednesday", "Thursday", "Friday"),
+  Temperature = c(32.6, 38.2, 37.5),
+  Rainfall = c(1.54, 1.33, 0.33),
+  Flyers = c(23, 16, 19),
+  Price = c(0.5, 0.5, 0.5),
+  Sales = c(12, 14, 15)
+)
+final.data <- rbind(test, new.data)
+print(final.data)
+print("3 rows are added")
+
+# 5. Day and date when maximum sales were done
+# FIX: search the full data (final.data); 'select' must be lower-case and needs a comma
+salesmax <- max(final.data$Sales)
+print(salesmax)
+data2 <- subset(final.data, Sales == salesmax, select = c(Date, Day))
+print(data2)
+
+# 6. Day and date when minimum sales were done
+salesmin <- min(final.data$Sales)
+print(salesmin)
+data3 <- subset(final.data, Sales == salesmin, select = c(Date, Day))
+print(data3)
+
+# 7. Maximum sales based on temperature
+data4 <- tapply(final.data$Sales, final.data$Temperature, max)
+print(data4)
+
+# 8. Add new column Total
+# FIX: journal filled this column with car brand names; a Total should be Price * Sales
+final.data$Total <- final.data$Price * final.data$Sales
+print(final.data)

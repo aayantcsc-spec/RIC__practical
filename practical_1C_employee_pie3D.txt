@@ -1,0 +1,11 @@
+# Practical 1C: Data frame of employee salary, name and date -> 3D pie chart
+# Needs Employee.csv (emp_id, emp_name, salary, start_date) in the working directory
+library(plotrix)
+data <- read.csv("Employee.csv")
+names(data) <- tolower(names(data))   # FIX: R is case-sensitive (Salary vs salary)
+print(data)
+
+png(file = "Prac.png")
+pie3D(data$salary, labels = data$emp_name, radius = 1.5,
+      main = "PIE CHART OF THE EMPLOYEE")
+dev.off()

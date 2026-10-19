@@ -1,0 +1,161 @@
+# Practical 8: Covid data analysis
+# Needs covid_state.csv  (State, c_date, tot_cases, Recovered, tot_tests, Confirmed)
+#   and covid19_countries.csv (c_codes, tot_cases, Recovered) in the working directory.
+
+rm(list = ls())
+data1 <- read.csv("covid_state.csv")
+print(head(data1))
+
+# ---- helper functions (defined once, used by every question) ----
+sumfun <- function(y) {
+  sum <- 0
+  for (i in 1:(length(y))) {
+    sum <- sum + y[i]
+  }
+  return(sum)
+}
+
+findindex <- function(v, a) {
+  val <- 0
+  for (i in 1:(length(a))) {
+    if (a[i] == v) {
+      val <- i
+      break
+    }
+  }
+  return(val)          # FIX: journal returned i (always the last index) -> wrong "best" state
+}
+
+# returns rows of one state between two dates
+get_state <- function(st, from, to) {
+  subset(data1, State == st & as.Date(c_date) >= as.Date(from) & as.Date(c_date) <= as.Date(to))
+}
+
+# ===== Q1. Compare total covid cases of April for 5 states; best recovery percentage =====
+mh <- get_state("MH", "2020-04-01", "2020-04-30")
+ap <- get_state("AP", "2020-04-01", "2020-04-30")
+ar <- get_state("AR", "2020-04-01", "2020-04-30")
+as <- get_state("AS", "2020-04-01", "2020-04-30")
+br <- get_state("BR", "2020-04-01", "2020-04-30")
+
+rec_mh <- sumfun(mh$Recovered); con_mh <- sumfun(mh$tot_cases)
+rec_ap <- sumfun(ap$Recovered); con_ap <- sumfun(ap$tot_cases)
+rec_ar <- sumfun(ar$Recovered); con_ar <- sumfun(ar$tot_cases)
+rec_as <- sumfun(as$Recovered); con_as <- sumfun(as$tot_cases)
+rec_br <- sumfun(br$Recovered); con_br <- sumfun(br$tot_cases)
+
+mh_rec_per <- (rec_mh / con_mh) * 100
+ap_rec_per <- (rec_ap / con_ap) * 100
+ar_rec_per <- (rec_ar / con_ar) * 100
+as_rec_per <- (rec_as / con_as) * 100
+br_rec_per <- (rec_br / con_br) * 100
+
+labels1 <- c("Maharashtra", "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar")
+perc_list <- c(mh_rec_per, ap_rec_per, ar_rec_per, as_rec_per, br_rec_per)
+print(perc_list)
+max_perc_list <- max(perc_list)
+labelindex <- findindex(max_perc_list, perc_list)
+state1 <- labels1[labelindex]
+cat(state1, " is the best state with a recovery rate of ", max_perc_list, ".\n")
+
+x <- round(perc_list, 2)
+png(file = "State_Recovery_Pie_Chart_1.png")
+pie(x, labels = x, main = "State Recovery Pie Chart", col = rainbow(length(x)))
+legend("topright", labels1, cex = 0.6, fill = rainbow(length(x)))
+dev.off()
+
+# ===== Q2. Compare cases raised from previous month (April) to current month (May) - MH =====
+mh_april <- get_state("MH", "2020-04-01", "2020-04-30")
+mh_may   <- get_state("MH", "2020-05-01", "2020-05-31")
+tot_april <- sum(mh_april$tot_cases)    # FIX: renamed from rec_mh_april (it sums tot_cases, not Recovered)
+tot_may   <- sum(mh_may$tot_cases)
+print(tot_april)
+print(tot_may)
+cases_raised <- tot_may - tot_april
+cat("Difference in cases from April to May is ", cases_raised, ".\n")
+
+png(file = "Cases_comparison_of_April_and_May.png")
+plot(mh_april$tot_cases, type = "o", col = "red", xlab = "Day of month", ylab = "Total Cases",
+     main = "Total Cases Chart month-wise",
+     ylim = range(c(mh_april$tot_cases, mh_may$tot_cases)))
+lines(mh_may$tot_cases, type = "o", col = "blue")
+legend("topleft", c("April", "May"), col = c("red", "blue"), lty = 1, pch = 1)
+dev.off()
+
+# ===== Q3. Pie chart / histogram: total cases, recovered, tests (Maharashtra, April) =====
+mh_03 <- get_state("MH", "2020-04-01", "2020-04-30")
+rec03  <- mh_03$Recovered
+tot03  <- mh_03$tot_tests
+conf03 <- mh_03$Confirmed
+v <- c(sumfun(rec03), sumfun(tot03), sumfun(conf03))
+print(v)
+
+png(file = "Covid-19_cases.png")
+hist(rec03, xlab = "Recovered cases", col = "cyan1", border = "navy",   # FIX: x-label was "Weight"
+     main = "Covid-19 cases")
+dev.off()
+
+png(file = "Covid19_PIE.png")
+labels <- c("Recovered", "Total Tests", "Confirmed Cases")
+pie(v, labels, main = "Covid Analysis", col = topo.colors(length(v)))
+legend("topright", labels, cex = 0.8, fill = topo.colors(length(v)))
+dev.off()
+
+# ===== Q4. Month where maximum patients recovered, and test ratio (Maharashtra) =====
+mh_mon <- subset(data1, State == "MH")
+month_key <- format(as.Date(mh_mon$c_date), "%Y-%m")     # FIX: whole months (journal stopped on the 30th)
+months_k <- c("2020-04", "2020-05", "2020-06", "2020-07", "2020-08", "2020-09", "2020-10")
+labels2  <- c("April", "May", "June", "July", "August", "September", "October")
+monthrec <- numeric(0)
+testratio <- numeric(0)
+for (m in months_k) {
+  d <- mh_mon[month_key == m, ]
+  rec_m <- sumfun(d$Recovered)
+  tot_m <- sumfun(d$tot_tests)
+  monthrec  <- c(monthrec, rec_m)
+  testratio <- c(testratio, rec_m / tot_m)    # FIX: journal divided July by June's tests (totjun)
+}
+print(monthrec)
+maxrecmonth <- max(monthrec)
+print(maxrecmonth)
+labelindex2 <- findindex(maxrecmonth, monthrec)
+state3 <- labels2[labelindex2]
+cat(state3, " is the best month with ", maxrecmonth, " recovered patients.\n")
+
+testratioframe <- data.frame(months = labels2, test_ratio = testratio, stringsAsFactors = FALSE)
+print("Test Ratio DataFrame=")
+print(testratioframe)
+
+png(file = "Test_Ratio_Histogram.png")
+hist(testratioframe$test_ratio, xlab = "Test ratio (recovered / tests)", col = "aquamarine",
+     border = "blue4", breaks = 5, main = "Histogram of test ratio")   # FIX: removed fixed xlim/ylim that clipped data
+dev.off()
+
+# ===== Q5. Country-wise comparison of covid cases =====
+data2 <- read.csv("covid19_countries.csv")
+ind  <- subset(data2, c_codes == "IND")
+us   <- subset(data2, c_codes == "US")
+bra  <- subset(data2, c_codes == "BRA")
+russ <- subset(data2, c_codes == "RUSS")
+uk   <- subset(data2, c_codes == "UK")
+
+percind  <- (sumfun(ind$Recovered)  / sumfun(ind$tot_cases))  * 100
+percus   <- (sumfun(us$Recovered)   / sumfun(us$tot_cases))   * 100
+percbra  <- (sumfun(bra$Recovered)  / sumfun(bra$tot_cases))  * 100
+percruss <- (sumfun(russ$Recovered) / sumfun(russ$tot_cases)) * 100
+percuk   <- (sumfun(uk$Recovered)   / sumfun(uk$tot_cases))   * 100
+
+ctry_labels <- c("India", "United States", "Brazil", "Russia", "United Kingdom")
+recperccountry <- c(percind, percus, percbra, percruss, percuk)
+print(recperccountry)
+maxperccrty <- max(recperccountry)
+labelindex4 <- findindex(maxperccrty, recperccountry)
+state1 <- ctry_labels[labelindex4]
+print(state1)
+cat(state1, " is the best country with a recovery rate of ", maxperccrty, ".\n")
+
+x <- round(recperccountry, 2)
+png(file = "International_Recovery_Pie_Chart_1.png")
+pie(x, labels = x, main = "International Recovery Pie Chart", col = rainbow(length(x)))
+legend("topright", ctry_labels, cex = 0.6, fill = rainbow(length(x)))
+dev.off()

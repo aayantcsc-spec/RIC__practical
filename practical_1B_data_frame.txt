@@ -1,0 +1,13 @@
+# Practical 1B: Create a Data Frame from X = 21, 62, 10, 53 and Y = city names
+X <- c(21, 62, 10, 53)
+Y <- c("London", "New York", "Singapore", "Mumbai")
+
+df <- data.frame(X, Y)
+print(df)
+str(df)
+cat("Rows:", nrow(df), " Columns:", ncol(df), "\n")
+
+# Pie chart from the data frame
+png(file = "city_dataframe_pie.png")
+pie(df$X, labels = df$Y, main = "City pie chart", col = rainbow(nrow(df)))
+dev.off()

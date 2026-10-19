@@ -1,0 +1,67 @@
+# Practical 4: Nominal, interval/ratio and ordinal variables using factor()
+
+# 1] Levels of factor of a given vector
+v <- c(1, 1, 3, 6, 4, NA, 3, 6, 4, 8, NA, 5)
+print("Original vector:")
+print(v)
+print("Levels of factor of the said vector:")
+print(levels(factor(v)))
+
+# 2] Change the first level of a factor with another level
+v <- c("Z", "A", "M", "C", "B")
+print("Original vector:")
+print(v)
+f <- factor(v)
+print("Factor of the said vector:")
+print(f)
+levels(f)[1] <- "e"
+print(f)
+
+# 3] Ordered factor from month names
+# FIX: journal used plain factor(); ordered=TRUE with month.name gives a real ordered factor
+mons_v <- c("March","April","January","November","January","September","October",
+            "September","November","August","February","January","November","November",
+            "February","May","August","February","July","December","August","August",
+            "September","November","September","February","April")
+print("Original vector:")
+print(mons_v)
+f <- factor(mons_v, levels = month.name, ordered = TRUE)
+print("Ordered factors of the said vector:")
+print(f)
+print(table(f))
+
+# 4] Concatenate two factors into a single factor
+f1 <- factor(sample(LETTERS, size = 6, replace = TRUE))
+f2 <- factor(sample(LETTERS, size = 6, replace = TRUE))
+print("Original factors:")
+print(f1)
+print(f2)
+f <- factor(c(levels(f1)[f1], levels(f2)[f2]))
+print("After concatenate factor becomes:")
+print(f)
+
+# 5] pH levels of soil to an ordered factor
+ph <- c(1, 3, 10, 7, 5, 4, 3, 7, 8, 7, 5, 3, 10, 10, 7)
+print("Original data:")
+print(ph)
+ph_f <- factor(ph, levels = c(3, 7, 10), ordered = TRUE)
+print("pH levels of soil to an ordered factor:")
+print(ph_f)
+
+# 6] Extract five of the levels of a factor
+L <- sample(LETTERS, size = 50, replace = TRUE)
+print("Original data:")
+print(L)
+f <- factor(L)
+print("Original factors:")
+print(f)
+print("Only five of the levels")
+print(table(L[1:5]))
+
+# 7] Factor corresponding to height of the 'women' data set
+data <- women
+print("Women data set of height and weights:")
+print(data)
+height_f <- cut(women$height, 3)
+print("Factor corresponding to height:")
+print(table(height_f))

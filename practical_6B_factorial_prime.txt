@@ -1,0 +1,33 @@
+# Practical 6B: Factorial and prime number using user-defined functions with return
+n <- 11
+
+factorial_func <- function(number) {
+  num <- number
+  fact <- 1
+  for (i in seq_len(num)) {      # FIX: seq_len() also handles 0 correctly (0! = 1)
+    fact <- fact * i
+  }
+  return(fact)
+}
+
+prime_func <- function(number) {
+  # FIX: numbers below 2 are not prime; original wrongly said 2 is "Not a prime"
+  if (number < 2) return("Not a prime !!!")
+  flag_ctf <- FALSE
+  if (number > 2) {
+    for (i in 2:(number - 1)) {
+      if (number %% i == 0) {
+        flag_ctf <- TRUE
+        break
+      }
+    }
+  }
+  if (flag_ctf == TRUE) {
+    return("Not a prime !!!")
+  } else {
+    return("Prime number !!!")
+  }
+}
+
+print(prime_func(n))
+print(factorial_func(n))

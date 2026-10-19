@@ -1,0 +1,20 @@
+# Practical 6A: Palindrome check using a user-defined function with return
+n <- 123
+
+palindrome_func <- function(number) {
+  num <- number
+  a <- 0
+  while (num != 0) {
+    c <- num %% 10
+    a <- a * 10 + c
+    num <- as.integer(num / 10)
+  }
+  if (number == a) {
+    return("Its a palindrome !")
+  } else {
+    return("Not a palindrome ..!")
+  }
+}
+
+print(palindrome_func(n))
+print(palindrome_func(121))

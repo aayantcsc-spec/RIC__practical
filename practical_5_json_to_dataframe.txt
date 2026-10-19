@@ -1,0 +1,8 @@
+# Practical 5: Read a JSON file and convert JSON data into a Data Frame
+# One-time install:  install.packages("rjson")
+library("rjson")
+
+# FIX: relative path (journal had a hard-coded C:\Users\... path). Keep prac5.json in the working directory.
+result <- fromJSON(file = "prac5.json")
+json_data_frame <- as.data.frame(result)
+print(json_data_frame)
